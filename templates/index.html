@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row" >             
+   <div class="col-xl-8 col-md-8 col-sm-12 col-12" >
+      <div class="card" style="margin-top:50px;">
+        <div class="card-header">
+            <span class="switch-label-after">Prepagata</span>
+            <label class="switch">
+              <input id="switch_box"  type="checkbox">
+              <span class="slider round"></span>
+            </label>
+            <span class="switch-label-before">Utente</span>
+        </div>
+        <div class="card-body">
+            <div id="box-prepagata">
+               <table id="table_prepagata" class="table table-striped display" style="width:100%">
+                 <thead>
+                     <tr style="background: #ff9800;">
+                         <th></th>
+                         <th>Prepagata</th>
+                         <th>StorageLevel</th>
+                         <th>Size</th>
+                         <th>Price</th>                      
+                     </tr>
+                 </thead>     
+                                      
+                 <tbody>
+                     {% for p,v in prepagata.items %}
+                        {% for s,elem in v.items %}    
+                           {% if s != 'size_' and s != 'price_' %}                   
+                           <tr>
+                              <td><a   class="btn btn-primary" href="{% url "dettaglio" %}?p={{p}}&s={{s}}"><i class="fa fa-search"></i> </a> </td>
+                              <td>{{p}}</td>
+                              <td>{{s}}</td>
+                              <td>{{elem.size}}</td>
+                              <td>{{elem.price}}</td>
+                           </tr>                       
+                           {% endif %}
+                        {% endfor %}   
+                     {% endfor %}                   
+                 </tbody>
+                 <tfoot>
+                     <tr>
+                         <th></th>
+                         <th>Prepagata</th>
+                         <th>StorageLevel</th>
+                         <th>Size</th>
+                         <th>Price</th>     
+                     </tr>
+                 </tfoot>
+             </table>
+          </div>
+          <div id="box-utente" style="display:none;" >
+             <table id="table_utente" class="table table-striped display" style="width:100%;">
+                 <thead>
+                     <tr style="background: #4caf50;">
+                         <th></th>
+                         <th>Utente</th>
+                         <th>StorageLevel</th>
+                         <th>Size</th>
+                         <th>Price</th>                      
+                     </tr>
+                 </thead>     
+                                      
+                 <tbody>
+                     {% for u,v in utente.items %}
+                        {% for s,elem in v.items %}
+                           {% if s != 'size_' and s != 'price_' %}
+                           <tr>
+                              <td><a  class="btn btn-primary" href="{% url "dettaglio" %}?u={{u}}&s={{s}}"><i class="fa fa-search"></i> </a> </td>
+                              <td>{{u}}</td>
+                              <td>{{s}}</td>
+                              <td>{{elem.size}}</td>
+                              <td>{{elem.price}}</td>
+                           </tr>
+                           {% endif %}
+                        {% endfor %}   
+                     {% endfor %}                   
+                 </tbody>
+                 <tfoot>
+                     <tr>
+                         <th></th>
+                         <th>Utente</th>
+                         <th>StorageLevel</th>
+                         <th>Size</th>
+                         <th>Price</th>     
+                     </tr>
+                 </tfoot>
+             </table>
+          </div>
+        </div>
+      </div>       
+   </div>
+   <div class="col-xl-4 col-md-4 col-sm-12 col-12" >
+      <div class="row" >
+         <div class="col-sm-6">
+            <div class="card graph-box" style="margin-top:50px;">
+               <div class="card-header">
+                  Prepagata / Price 
+               </div>      
+               <div class="card-body" >
+                  <canvas id="Chart1" width="80%" height="200" ></canvas>
+               </div>
+            </div>   
+         </div>
+         <div class="col-sm-6">
+            <div class="card graph-box" style="margin-top:50px;">
+               <div class="card-header">
+                  Utente / Price
+               </div>      
+               <div class="card-body">
+                  <canvas id="Chart3" width="80%" height="200"></canvas>
+               </div>
+            </div>      
+         </div>
+      </div>
+      <div class="row" >
+         <div class="col-sm-6">
+            <div class="card graph-box" style="margin-top:50px;">
+               <div class="card-header">
+                  Prepagata / Size
+               </div>      
+               <div class="card-body">
+                  <canvas id="Chart2" width="80%" height="200"></canvas>
+               </div>
+            </div>  
+         </div>
+         <div class="col-sm-6">
+            <div class="card graph-box" style="margin-top:50px;">
+               <div class="card-header">
+                  Utente / Size
+               </div>      
+               <div class="card-body">
+                  <canvas id="Chart4" width="80%" height="200"></canvas>
+               </div>
+            </div> 
+         </div>
+      </div>       
+   </div>
+</div>         
+{% endblock %}
+
+
+{% block extrajs %}
+<script src="{% static "/node_modules/chart.js/dist/Chart.js" %}"></script>
+
+<script>
+$(document).ready(function() {
+	  	
+	function hashCode(str) { // java String#hashCode
+	    var hash = 0;
+	    for (var i = 0; i < str.length; i++) {
+	       hash = str.charCodeAt(i) + ((hash << 5) - hash);
+	    }
+	    return hash;
+	} 
+
+	function intToRGB(i){
+	    var c = (i & 0x00FFFFFF)
+	        .toString(16)
+	        .toUpperCase();
+
+	    return "00000".substring(0, 6 - c.length) + c;
+	}
+    
+
+    var dynamicColors = function() {
+       var r = Math.floor(Math.random() * 255);
+       var g = Math.floor(Math.random() * 255);
+       var b = Math.floor(Math.random() * 255);
+       return "rgb(" + r + "," + g + "," + b + ")";
+    };
+    
+    var coloR = [];
+    {% for p,v in prepagata.items %}  
+       //coloR.push(dynamicColors());
+       coloR.push('#'+intToRGB(hashCode('{{p}}')));
+    {% endfor %}
+      
+
+	var ctx1 = document.getElementById("Chart1");	
+	ctx1.height= 280;
+	var Chart1 = new Chart(ctx1, {
+		type: 'pie',
+		 data: {
+			 labels: [
+				 {% for p,v in prepagata.items %}
+				 	"{{p}}",
+				 {% endfor %}
+			 ],
+			 datasets: [{		             
+      			 data:[
+      				 {% for p,v in prepagata.items %}
+      				 	{{v.price_}},
+      				 {% endfor %}
+      			 ], 
+      		     backgroundColor: coloR,
+
+                 borderColor: 'rgba(200, 200, 200, 0.75)',
+                 //hoverBackgroundColor: 'rgba(200, 200, 200, 1)',
+                 hoverBorderColor: 'rgba(200, 200, 200, 1)',
+			 }],			 
+		 },
+		 options: {
+             maintainAspectRatio: false,
+             legend: {
+                 display: false
+             },
+         } 
+		
+	});
+	
+	var ctx2 = document.getElementById("Chart2");
+	ctx2.height = 280;
+	var Chart2 = new Chart(ctx2, {
+		 type: 'pie',
+		 data: {
+			 labels: [
+				 {% for p,v in prepagata.items %}
+				 	"{{p}}",
+				 {% endfor %}
+			 ],
+			 datasets: [{		             
+      			 data:[
+      				 {% for p,v in prepagata.items %}
+      				 	{{v.size_}},
+      				 {% endfor %}
+      			 ],
+      			 backgroundColor: coloR,
+
+                 borderColor: 'rgba(200, 200, 200, 0.75)',
+                 //hoverBackgroundColor: 'rgba(200, 200, 200, 1)',
+                 hoverBorderColor: 'rgba(200, 200, 200, 1)',
+			 }],			 
+		 },
+		 options: {
+             maintainAspectRatio: false,
+             legend: {
+                 display: false
+             },
+         } 
+		
+	});  
+	 
+	var coloR2 = [];
+    {% for p,v in utente.items %}  
+       //coloR.push(dynamicColors());
+       coloR2.push('#'+intToRGB(hashCode('{{p}}')));
+    {% endfor %}
+      
+
+	var ctx3 = document.getElementById("Chart3");	
+	ctx3.height= 280;
+	var Chart3 = new Chart(ctx3, {
+		type: 'pie',
+		 data: {
+			 labels: [
+				 {% for p,v in utente.items %}
+				 	"{{p}}",
+				 {% endfor %}
+			 ],
+			 datasets: [{		             
+      			 data:[
+      				 {% for p,v in utente.items %}
+      				 	{{v.price_}},
+      				 {% endfor %}
+      			 ], 
+      		     backgroundColor: coloR2,
+
+                 borderColor: 'rgba(200, 200, 200, 0.75)',
+                 //hoverBackgroundColor: 'rgba(200, 200, 200, 1)',
+                 hoverBorderColor: 'rgba(200, 200, 200, 1)',
+			 }],			 
+		 },
+		 options: {
+             maintainAspectRatio: false,
+             legend: {
+                 display: false
+             },
+         } 
+		
+	});
+	
+	var ctx4 = document.getElementById("Chart4");
+	ctx4.height = 280;
+	var Chart4 = new Chart(ctx4, {
+		 type: 'pie',
+		 data: {
+			 labels: [
+				 {% for p,v in utente.items %}
+				 	"{{p}}",
+				 {% endfor %}
+			 ],
+			 datasets: [{		             
+      			 data:[
+      				 {% for p,v in utente.items %}
+      				 	{{v.size_}},
+      				 {% endfor %}
+      			 ],
+      			 backgroundColor: coloR2,
+
+                 borderColor: 'rgba(200, 200, 200, 0.75)',
+                 //hoverBackgroundColor: 'rgba(200, 200, 200, 1)',
+                 hoverBorderColor: 'rgba(200, 200, 200, 1)',
+			 }],			 
+		 },
+		 options: {
+             maintainAspectRatio: false,
+             legend: {
+                 display: false
+             },
+         } 
+		
+	});
+	
+	
+	$('#switch_box').click(function(){
+		$('#box-utente').toggle();
+		$('#box-prepagata').toggle();		 
+	});
+	
+    $('#table_prepagata').DataTable({
+    	
+    	colReorder: true,
+    	//keys: true,
+    	responsive: true,
+    	lengthMenu: [ [ 25, 50, -1], [ 25, 50, "All"] ],
+    	dom: '<"top"f<"html5buttons"B>>rt<"bottom"ilp><"clear">',
+        buttons: [            
+            {extend: 'csv',   className: 'btn-sm' },
+            {extend: 'excel', className: 'btn-sm', title: 'XLS-File'},
+            {extend: 'pdf',   className: 'btn-sm', title: $('title').text() },
+            {extend: 'print', className: 'btn-sm' }
+        ],  
+       
+    });
+    
+	$('#table_utente').DataTable({    	
+    	colReorder: true,
+    	//keys: true,
+    	responsive: true,
+    	lengthMenu: [ [ 25, 50, -1], [ 25, 50, "All"] ],
+    	dom: '<"top"f<"html5buttons"B>>rt<"bottom"ilp><"clear">',
+        buttons: [            
+            {extend: 'csv',   className: 'btn-sm' },
+            {extend: 'excel', className: 'btn-sm', title: 'XLS-File'},
+            {extend: 'pdf',   className: 'btn-sm', title: $('title').text() },
+            {extend: 'print', className: 'btn-sm' }
+        ],  
+        
+    });
+	
+	
+	{% if user_sel %}
+	$('#switch_box').trigger('click');
+	$('#box-utente').show();
+	$('#box-prepagata').hide();
+	{% endif %}
+	
+} );
+
+</script>
+{% endblock %}
+
+{% block extracss %}
+<style>
+   .switch {
+     position: relative;
+     display: inline-block;
+     width: 60px;
+     height: 34px;
+   }
+   
+   .switch input {display:none;}
+   
+   .slider {
+     position: absolute;
+     cursor: pointer;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background-color: #ff9800;
+     -webkit-transition: .4s;
+     transition: .4s;
+   }
+   
+   .slider:before {
+     position: absolute;
+     content: "";
+     height: 26px;
+     width: 26px;
+     left: 4px;
+     bottom: 4px;
+     background-color: white;
+     -webkit-transition: .4s;
+     transition: .4s;
+   }
+   
+   input:checked + .slider {
+     background-color: #4caf50;
+   }
+   
+   input:focus + .slider {
+     box-shadow: 0 0 1px #4caf50;
+   }
+   
+   input:checked + .slider:before {
+     -webkit-transform: translateX(26px);
+     -ms-transform: translateX(26px);
+     transform: translateX(26px);
+   }
+   
+   /* Rounded sliders */
+   .slider.round {
+     border-radius: 34px;
+   }
+   
+   .slider.round:before {
+     border-radius: 50%;
+   }
+   
+   .switch-label-after{
+       position: relative;
+       top: -18px;
+       margin-right: 10px;
+   }
+   .switch-label-before{
+       top: -18px;
+       position: relative;
+       margin-left: 10px;
+   }
+   
+</style>
+{% endblock %}
+
+    

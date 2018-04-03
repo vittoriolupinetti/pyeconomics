@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row" >             
+   <div class="col-12" style="margin-top:10px;" >
+      <br>
+      {% if user_sel %}
+      <a href="/?user_sel=1" class="btn btn-primary"> < torna indietro </a>
+      {% else %}
+      <a href="/" class="btn btn-primary"> < torna indietro</a>
+      {% endif %}
+      <br><br>
+      <div class="card" >
+         
+         {% if user_sel %}
+         <div class="card-header">      
+            <div class="row">
+               <div class="col-sm-6">
+                  <h3>Utente: {{u}} - {{s}}</h3>
+               </div>
+               <div class="col-sm-6 text-right">
+                   <h4>Price: {{price}} - Size: {{size}}</h4>  
+               </div>
+            </div>                                 
+         </div>
+         <div class="card-body">
+            <table id="table_utente" class="table table-striped display" style="width:100%">
+                 <thead>                      
+                     <tr style="background: #4caf50;">
+                         <th>Utente</th>                         
+                         <th>Prepagata</th>                         
+                         <th>StorageLevel</th>
+                         <th>OS</th>
+                         <th>Servizio</th>
+                         <th>IdStima</th>
+                         <th>Key</th>                         
+                         <th>Environment</th>
+                         <th>RequisitionID</th>
+                         <th>CPU</th>
+                         <th>RAM</th>
+                         <th>Size</th>
+                         <th>Price</th>                      
+                     </tr>
+                 </thead>                                          
+                 <tbody>
+                 {% for elem in diz %}
+                     <tr>
+                        <td>{{elem.Utente}}</td>
+                        <td>{{elem.Prepagata}}</td>
+                        <td>{{elem.StorageLevel}}</td>
+                        <td>{{elem.OS}}</td>
+                        <td>{{elem.Servizio}}</td>
+                        <td>{{elem.IdStima}}</td>
+                        <td>{{elem.key}}</td>
+                        <td>{{elem.Environment}}</td>
+                        <td>{{elem.RequisitionID}}</td>
+                        <td>{{elemCPU}}</td>
+                        <td>{{elem.RAM}}</td>
+                        <td>{{elem.Size}}</td>
+                        <td>{{elem.price}}</td>
+                     </tr>
+                 {% endfor %}
+                 </tbody>
+              </table>
+         </div>
+         {% else %}
+         <div class="card-header">                          
+            <div class="row">
+               <div class="col-sm-6">
+                  <h3>Prepagata: {{p}} - {{s}}</h3> 
+               </div>
+               <div class="col-sm-6 text-right">
+                   <h4>Price: {{price}} - Size: {{size}}</h4>  
+               </div>
+            </div>                                                 
+         </div>    
+         <div class="card-body">
+            <table id="table_prepagata" class="table table-striped display" style="width:100%">
+                 <thead>                      
+                     <tr style="background: #ff9800;">                         
+                         <th>Prepagata</th>
+                         <th>Utente</th>
+                         <th>StorageLevel</th>
+                         <th>OS</th>
+                         <th>Servizio</th>
+                         <th>IdStima</th>
+                         <th>Key</th>                         
+                         <th>Environment</th>
+                         <th>RequisitionID</th>
+                         <th>CPU</th>
+                         <th>RAM</th>
+                         <th>Size</th>
+                         <th>Price</th>                      
+                     </tr>
+                 </thead>                                          
+                 <tbody>
+                 {% for elem in diz %}
+                     <tr>
+                        <td>{{elem.Prepagata}}</td>
+                        <td>{{elem.Utente}}</td>
+                        <td>{{elem.StorageLevel}}</td>
+                        <td>{{elem.OS}}</td>
+                        <td>{{elem.Servizio}}</td>
+                        <td>{{elem.IdStima}}</td>
+                        <td>{{elem.key}}</td>
+                        <td>{{elem.Environment}}</td>
+                        <td>{{elem.RequisitionID}}</td>
+                        <td>{{elemCPU}}</td>
+                        <td>{{elem.RAM}}</td>
+                        <td>{{elem.Size}}</td>
+                        <td>{{elem.price}}</td>
+                     </tr>
+                 {% endfor %}
+                 </tbody>
+              </table>
+         </div>
+         {% endif %}
+      </div>
+   </div>
+</div>
+{% endblock %}
+
+
+{% block extrajs %}
+
+<script>
+$(document).ready(function() {
+	{% if user_sel %}
+	
+	$('#table_utente').DataTable({    	
+    	colReorder: true,
+    	//keys: true,
+    	responsive: true,
+    	lengthMenu: [ [ 25, 50, -1], [ 25, 50, "All"] ],
+    	dom: '<"top"f<"html5buttons"B>>rt<"bottom"ilp><"clear">',
+        buttons: [            
+            {extend: 'csv',   className: 'btn-sm' },
+            {extend: 'excel', className: 'btn-sm', title: 'XLS-File'},
+            {extend: 'pdf',   className: 'btn-sm', title: $('title').text() },
+            {extend: 'print', className: 'btn-sm' }
+        ],  
+        
+    });
+	
+    {% else %}
+    	
+	$('#table_prepagata').DataTable({
+    	
+    	colReorder: true,
+    	//keys: true,
+    	responsive: true,
+    	lengthMenu: [ [ 25, 50, -1], [ 25, 50, "All"] ],
+    	dom: '<"top"f<"html5buttons"B>>rt<"bottom"ilp><"clear">',
+        buttons: [            
+            {extend: 'csv',   className: 'btn-sm' },
+            {extend: 'excel', className: 'btn-sm', title: 'XLS-File'},
+            {extend: 'pdf',   className: 'btn-sm', title: $('title').text() },
+            {extend: 'print', className: 'btn-sm' }
+        ],  
+       
+    });
+	
+	{% endif %}
+	
+});
+</script>
+}
+
+{% endblock %}

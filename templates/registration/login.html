@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="height: 100vh;">
+   <div class="row align-items-center"  style="height: 100vh;">
+      <div class="col-sm-3"></div>
+      <div class="col-sm-6 align-self-center">
+          <div class="card">
+            <div class="card-header card-inverse card-primary">
+               Login
+            </div>
+            <div class="card-block">
+               {% if form.errors %}
+               <p>Username o password errati.</p>
+               {% endif %}
+               {% if next %}
+                   {% if user.is_authenticated %}
+                   <p>Non hai accesso a questa pagina. Per continuare, accedi con un account che ha i permessi per accedere al contenuto che vuoi visualizzare.</p>
+                   {% else %}
+                   <p>Esegui l'accesso per accedere alla pagina.</p>
+                   {% endif %}
+               {% endif %}
+
+               <form method="post" action="{% url 'login' %}">
+                  {% csrf_token %}
+                  <div class="form-group">
+                     <label for="exampleInputEmail1">Username</label>
+                     <input type="text" class="form-control" name="username" id="id_username" maxlength="254" required="" autofocus="">                                          
+                  </div>
+                  <div class="form-group">
+                     <label for="exampleInputEmail1">Password</label>
+                     <input type="password" class="form-control" name="password" id="id_password" required="">
+                     {#<small ><a style="color:blue;" href="{% url 'password_reset' %}">recupera password</a></small>#}
+                  </div>
+                  <hr>                  
+                  <input type="submit" value="login"  class="btn btn-primary"/>
+                  <input type="hidden" name="next" value="{{ next }}" />
+               </form>
+            </div>
+          
+          </div>
+      </div>   
+   </div>
+</div>
+ 
+{% endblock %}
