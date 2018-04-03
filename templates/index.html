@@ -5,15 +5,25 @@
    <div class="col-xl-8 col-md-8 col-sm-12 col-12" >
       <div class="card" style="margin-top:50px;">
         <div class="card-header">
-            <span class="switch-label-after">Prepagata</span>
-            <label class="switch">
-              <input id="switch_box"  type="checkbox">
-              <span class="slider round"></span>
-            </label>
-            <span class="switch-label-before">Utente</span>
+           <div class="row">
+               <div class="col-sm-6">
+                  <span class="switch-label-after">Prepagata</span>
+                  <label class="switch">
+                    <input id="switch_box"  type="checkbox">
+                    <span class="slider round"></span>
+                  </label>
+                  <span class="switch-label-before">Utente</span>
+               </div>
+               <div class="col-sm-6 text-right">
+                  <input class="form-control" style="width:250px;float:right;" type="text" placeholder="search" id="search">
+               </div>
+           </div>
+            
         </div>
         <div class="card-body">
+               
             <div id="box-prepagata">
+               {% comment %}
                <table id="table_prepagata" class="table table-striped display" style="width:100%">
                  <thead>
                      <tr style="background: #ff9800;">
@@ -50,8 +60,110 @@
                      </tr>
                  </tfoot>
              </table>
+             {% endcomment %}
+             
+             {% for p,v in prepagata.items %}
+             <div class="card card-box-rect" style="margin-bottom:30px;" data-search="{{p}}">
+                <div class="card-body">
+                   <div class="row">
+                      
+                     <div class="col-sm-4" style="background-color:#ff9800;padding:50px;">
+                        <h4>
+                           <a class="btn btn-primary" href="{% url "dettaglio" %}?p={{p}}&s={{s}}"><i class="fa fa-search"></i> </a> {{p}}
+                        </h4>                        
+                     </div>
+                     <div class="col-sm-8">
+                        <table class="table table-striped display" style="width:100%">
+                           <thead>
+                              <tr style="background: #ff9800;">
+                                 <th>Tier</th>
+                                 <th>Size</th>
+                                 <th>Price</th>   
+                              </tr>
+                           </thead>
+                           <tbody>
+                              {% for sl in storage_level %}
+                                 <tr>
+                                    <th>{{sl.nome}}</th>                                    
+                                    {% for s,elem in v.items %}                                     
+                                       {% if sl.nome|lower == s|lower %}    
+                                       <th>
+                                          {{elem.size}}
+                                       </th>
+                                       <th>
+                                          {{elem.price}}
+                                       </th>                                        
+                                       {% endif %}                                       
+                                    {% endfor %}
+                                 </tr>                                 
+                              {% endfor %}                              
+                              <tr style="background-color: #444;color: #fff;">
+                                 <th>Totale</th>
+                                 <th>{{v.All.size}}</th>
+                                 <th>{{v.All.price}}</th>
+                              </tr>                               
+                           </tbody>
+                        </table>
+                     </div>
+                   </div>
+                </div>
+             </div>
+             {% endfor %}
+             
           </div>
           <div id="box-utente" style="display:none;" >
+          
+             {% for u,v in utente.items %}
+             <div class="card card-box-rect" style="margin-bottom:30px;" data-search="{{u}}">
+                <div class="card-body">
+                   <div class="row">
+                      
+                     <div class="col-sm-4" style="background-color:#4caf50;padding:50px;">
+                        <h4>
+                           <a class="btn btn-primary" href="{% url "dettaglio" %}?u={{u}}&s={{s}}"><i class="fa fa-search"></i> </a> {{u}}
+                        </h4>
+                        
+                     </div>
+                     <div class="col-sm-8">
+                        <table class="table table-striped display" style="width:100%">
+                           <thead>
+                              <tr style="background: #4caf50;">
+                                 <th>Tier</th>
+                                 <th>Size</th>
+                                 <th>Price</th>   
+                              </tr>
+                           </thead>
+                           <tbody>
+                              {% for sl in storage_level %}
+                                 <tr>
+                                    <th>{{sl.nome}}</th>                                    
+                                    {% for s,elem in v.items %}                                     
+                                       {% if sl.nome|lower == s|lower %}    
+                                       <th>
+                                          {{elem.size}}
+                                       </th>
+                                       <th>
+                                          {{elem.price}}
+                                       </th>                                        
+                                       {% endif %}                                       
+                                    {% endfor %}
+                                 </tr>                                 
+                              {% endfor %}                              
+                              <tr style="background-color: #444;color: #fff;">
+                                 <th>Totale</th>
+                                 <th>{{v.All.size}}</th>
+                                 <th>{{v.All.price}}</th>
+                              </tr>                               
+                           </tbody>
+                        </table>
+                     </div>
+                   </div>
+                </div>
+             </div>
+             {% endfor %}
+             
+             
+             {% comment %}
              <table id="table_utente" class="table table-striped display" style="width:100%;">
                  <thead>
                      <tr style="background: #4caf50;">
@@ -88,6 +200,7 @@
                      </tr>
                  </tfoot>
              </table>
+             {% endcomment %}
           </div>
         </div>
       </div>       
@@ -148,6 +261,16 @@
 <script>
 $(document).ready(function() {
 	  	
+	$('#search').keyup(function(){
+		if($(this).val()=='' ){
+			$('.card-box-rect').show();
+		} else {
+			$('.card-box-rect').hide();
+			$( ".card-box-rect[data-search*='"+$(this).val()+"' i]" ).show(); 
+		}
+	});
+	
+	
 	function hashCode(str) { // java String#hashCode
 	    var hash = 0;
 	    for (var i = 0; i < str.length; i++) {
@@ -319,7 +442,7 @@ $(document).ready(function() {
 		$('#box-utente').toggle();
 		$('#box-prepagata').toggle();		 
 	});
-	
+	/*
     $('#table_prepagata').DataTable({
     	
     	colReorder: true,
@@ -350,7 +473,7 @@ $(document).ready(function() {
         ],  
         
     });
-	
+	*/
 	
 	{% if user_sel %}
 	$('#switch_box').trigger('click');

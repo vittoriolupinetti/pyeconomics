@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.views.decorators.cache import cache_page
 from aruta.mongodb import Connection
-from .models import CostoStorage
+from .models import *
 from django.http.response import Http404
 
 TIME_CACHE=300
@@ -19,66 +19,96 @@ def index(request):
     c = Connection()
     all = c.getall()
     
+    storage_level = StorageLevel.objects.all()
+    
+    l_sl = []
+    cc = 0
+    for elem in storage_level:
+        if elem.nome not in l_sl:
+            l_sl.append(elem.nome.lower())
+            cc += 1  
+    
+    l_serv = []
+    for elem in Servizio.objects.all():
+        l_serv = elem.nome.lower()
+    
     prepagata = {}  
     utente = {}   
     for elem in all:
- 
-        if elem['Prepagata'] not in prepagata.keys():
-            prepagata[elem['Prepagata']]={'price_':0,'size_':0}
-            prepagata[elem['Prepagata']]['All']={'price':0,'size':0}
-            
-        if elem['StorageLevel'].title() not in prepagata[elem['Prepagata']].keys():
-            prepagata[elem['Prepagata']][elem['StorageLevel'].title()]={'price':0,'size':0}
-                    
-        try:
-            prepagata[elem['Prepagata']][elem['StorageLevel'].title()]['size']+=int(elem['Size'])
-            prepagata[elem['Prepagata']]['All']['size']+=int(elem['Size'])
-            prepagata[elem['Prepagata']]['size_']+=int(elem['Size'])
-        except:
-            pass
         
+        if elem['Servizio'].lower() in l_serv:
         
-        if FIELD_DATA in elem.keys():
-            c = CostoStorage.objects.filter(dal__lte=elem[FIELD_DATA],al__gte=elem[FIELD_DATA],storage_level__iexact=elem['StorageLevel']).first()
-            if c:
-                try:
-                    prepgata[elem['Prepagata']][elem['StorageLevel'].title()]['price']+= (int(elem['Size'])*c.costo)
-                    prepagata[elem['Prepagata']]['All']['price']+= (int(elem['Size'])*c.costo)
-                    prepagata[elem['Prepagata']]['price_']+=(int(elem['Size'])*c.costo)
-                except:
-                    pass
-            
+            if elem['StorageLevel'].lower() not in l_sl and elem['StorageLevel'].strip() != "" :
+                cc = cc + 1
+                s = StorageLevel()
+                s.nome = elem['StorageLevel'].title()
+                s.ordine = cc
+                s.save()
+                               
      
-        if elem['Utente'] not in utente.keys():
-            utente[elem['Utente']]={'price_':0,'size_':0}
-            utente[elem['Utente']]['All']={'price':0,'size':0}
-                    
-        if elem['StorageLevel'].title() not in utente[elem['Utente']].keys():
-            utente[elem['Utente']][elem['StorageLevel'].title()]={'price':0,'size':0}            
+            if elem['Prepagata'] not in prepagata.keys():
+                prepagata[elem['Prepagata']]={'price_':0,'size_':0}
+                for sl in l_sl:
+                    if sl.title() not in prepagata[elem['Prepagata']].keys():
+                        prepagata[elem['Prepagata']][sl.title()]={'price':0,'size':0}            
+                prepagata[elem['Prepagata']]['All']={'price':0,'size':0}
                 
-        try:
-            utente[elem['Utente']][elem['StorageLevel'].title()]['size']+=int(elem['Size'])
-            utente[elem['Utente']]['All']['size']+=int(elem['Size'])
-            utente[elem['Utente']]['size_']+=int(elem['Size'])
-        except:
-            pass
-        
-        
-        if FIELD_DATA in elem.keys():
-            c = CostoStorage.objects.filter(dal__lte=elem[FIELD_DATA],al__gte=elem[FIELD_DATA],storage_level__iexact=elem['StorageLevel']).first()
-            if c:
-                try:
-                    utente[elem['Utente']][elem['StorageLevel'].title()]['price']+= (int(elem['Size'])*c.costo)
-                    utente[elem['Utente']]['All']['price']+= (int(elem['Size'])*c.costo)
-                    utente[elem['Utente']]['price_']+= (int(elem['Size'])*c.costo)
-                except:
-                    pass
-        
+            if elem['StorageLevel'].title() not in prepagata[elem['Prepagata']].keys():
+                prepagata[elem['Prepagata']][elem['StorageLevel'].title()]={'price':0,'size':0}
+                        
+            try:
+                prepagata[elem['Prepagata']][elem['StorageLevel'].title()]['size']+=int(elem['Size'])
+                prepagata[elem['Prepagata']]['All']['size']+=int(elem['Size'])
+                prepagata[elem['Prepagata']]['size_']+=int(elem['Size'])
+            except:
+                pass
+            
+            
+            if FIELD_DATA in elem.keys():
+                c = CostoStorage.objects.filter(dal__lte=elem[FIELD_DATA],al__gte=elem[FIELD_DATA],servizio__nome__iexact=elem['Servizio'],storage_level__nome__iexact=elem['StorageLevel']).first()
+                if c:
+                    try:
+                        prepgata[elem['Prepagata']][elem['StorageLevel'].title()]['price']+= (int(elem['Size'])*c.costo)
+                        prepagata[elem['Prepagata']]['All']['price']+= (int(elem['Size'])*c.costo)
+                        prepagata[elem['Prepagata']]['price_']+=(int(elem['Size'])*c.costo)
+                    except:
+                        pass
+                
+         
+            if elem['Utente'] not in utente.keys():
+                utente[elem['Utente']]={'price_':0,'size_':0}
+                for sl in l_sl:
+                    if sl.title() not in utente[elem['Utente']].keys():
+                        utente[elem['Utente']][sl.title()]={'price':0,'size':0}
+                utente[elem['Utente']]['All']={'price':0,'size':0}
+                        
+            if elem['StorageLevel'].title() not in utente[elem['Utente']].keys():
+                utente[elem['Utente']][elem['StorageLevel'].title()]={'price':0,'size':0}            
+                    
+            try:
+                utente[elem['Utente']][elem['StorageLevel'].title()]['size']+=int(elem['Size'])
+                utente[elem['Utente']]['All']['size']+=int(elem['Size'])
+                utente[elem['Utente']]['size_']+=int(elem['Size'])
+            except:
+                pass
+            
+            
+            if FIELD_DATA in elem.keys():
+                c = CostoStorage.objects.filter(dal__lte=elem[FIELD_DATA],al__gte=elem[FIELD_DATA],servizio__nome__iexact=elem['Servizio'],storage_level__nome__iexact=elem['StorageLevel']).first()
+                if c:
+                    try:
+                        utente[elem['Utente']][elem['StorageLevel'].title()]['price']+= (int(elem['Size'])*c.costo)
+                        utente[elem['Utente']]['All']['price']+= (int(elem['Size'])*c.costo)
+                        utente[elem['Utente']]['price_']+= (int(elem['Size'])*c.costo)
+                    except:
+                        pass
+            
     
     return render(request,'index.html',{
             'prepagata':prepagata,
             'utente':utente,
-            'user_sel':request.GET.get('user_sel'),            
+            'user_sel':request.GET.get('user_sel'),  
+            'storage_level': storage_level,         
         })
     
     
@@ -116,7 +146,7 @@ def dettaglio(request):
     diz = []
     for elem in find:
         if FIELD_DATA in elem.keys():
-            c = CostoStorage.objects.filter(dal__lte=elem[FIELD_DATA],al__gte=elem[FIELD_DATA],storage_level__iexact=elem['StorageLevel']).first()
+            c = CostoStorage.objects.filter(dal__lte=elem[FIELD_DATA],al__gte=elem[FIELD_DATA],storage_level__name__iexact=elem['StorageLevel']).first()
             if c:
                 try:                    
                     elem['price'] = (int(elem['Size'])*c.costo)
