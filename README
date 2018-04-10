@@ -1,2 +1,7 @@
-Per la prima installazione eseguire i seguenti comandi:
+Configurazione software:
 
+File Configurazione MongoDB 
+pyeconomics/mongodb.py
+
+File Configurazione Generale e DBSQLite3 
+pyeconomics/settings.py

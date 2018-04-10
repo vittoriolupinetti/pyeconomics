@@ -1,5 +1,5 @@
 """
-WSGI config for aruta project.
+WSGI config for pyeconomics project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

@@ -4,8 +4,17 @@ import re
 
 class Connection():
     def __init__(self):
-        self.client = MongoClient('mongodb://localhost:27017')
-        self.db = self.client.aruta
+        try:
+            # Configurazione mondodb
+            self.client = MongoClient('mongodb://localhost:270170')
+            self.db = self.client.aruta
+        except:
+            self.db = None
+            
+    def status(self):
+        if not self.db:
+            return False        
+        return True
         
     def serverStatus(self):
         serverStatusResult=self.db.command("serverStatus")

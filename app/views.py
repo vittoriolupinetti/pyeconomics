@@ -6,7 +6,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.views.decorators.cache import cache_page
-from aruta.mongodb import Connection
+from pyeconomics.mongodb import Connection
 from .models import *
 from django.http.response import Http404
 
@@ -17,6 +17,10 @@ FIELD_DATA = 'data'
 #@cache_page(TIME_CACHE)
 def index(request):
     c = Connection()
+    
+    if not c.db:
+        return render(request,'error_mongodb.html',{})
+    
     all = c.getall()
     
     storage_level = StorageLevel.objects.all()
