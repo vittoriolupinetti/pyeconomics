@@ -1,2 +1,2 @@
 django==2
-pymongo
+pymongo==3.6.1

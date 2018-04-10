@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'aruta.urls'
+ROOT_URLCONF = 'pyeconomics.urls'
 
 TEMPLATES = [
     {
@@ -68,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'aruta.wsgi.application'
+WSGI_APPLICATION = 'pyeconomics.wsgi.application'
 
 
 # Database
@@ -77,10 +77,11 @@ WSGI_APPLICATION = 'aruta.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR,'db', 'db.sqlite3'),
     }
 }
 
+"""
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
@@ -88,7 +89,7 @@ CACHES = {
         'LOCATION':  '/tmp/django_cache/',
     }
 }
-
+"""
  
 
 # Password validation

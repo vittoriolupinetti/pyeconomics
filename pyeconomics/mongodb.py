@@ -28,28 +28,4 @@ class Connection():
             return self.db.aruta_export.find({'Utente':p,'StorageLevel':regex})
     
         return self.db.aruta_export.find({'Utente':p})
-    """
-    def get_aggregate(self,type):
-        if type==1:
-            # prepagata
-            pass
-            
-        if type==2:
-            # utente
-            pass
-        
-    def get_aggregate_prepagata(self):
-        return self.db.aruta_export.aggregate([ 
-            {
-                '$group':{
-                    "_id":"$Prepagata"  ,   
-                    "size":{"$sum":1},               
-                    },                
-            },
-            {
-                "$sort":{"_id":1},
-            }
-            
-        ])
-    """ 
-        
+    
