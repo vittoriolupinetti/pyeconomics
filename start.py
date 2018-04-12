@@ -12,3 +12,5 @@ if db_create:
     subprocess.check_output(['python3.6','/var/www/pyeconomics/manage.py','load','/var/www/pyeconomics/auth.json'])
     subprocess.check_output(['python3.6','/var/www/pyeconomics/manage.py','load','/var/www/pyeconomics/app.json'])
  
+ 
+subprocess.check_output(['python3.6','/var/www/pyeconomics/manage.py','runserver'])
