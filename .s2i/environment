@@ -1,0 +1,2 @@
+APP_MODULE=pyeconomics:wsgi
+DISABLE_COLLECTSTATIC=1
