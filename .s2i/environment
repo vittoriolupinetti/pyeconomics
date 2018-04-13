@@ -1,2 +1,2 @@
-APP_MODULE=pyeconomics:wsgi
+APP_HOME=pyeconomics
 DISABLE_COLLECTSTATIC=1
