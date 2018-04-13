@@ -17,4 +17,4 @@ if db_create:
  
  
 #subprocess.check_output(['python3','/opt/app-root/src/manage.py','runserver'])
-subprocess.check_output(['gunicorn','pyeconomics.wsgi'])
+subprocess.check_output(['gunicorn','-b', '0.0.0.0:8080 ','pyeconomics.wsgi'])
